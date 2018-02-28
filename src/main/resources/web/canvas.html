@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Number Identifier</title>
+    <script type="application/javascript" src="jquery-3.3.1.min.js"></script>
+    <script>
+        $(function () {
+            var dimension = 8;
+
+            $('#btnNext').on('click', function (event) {
+                var result = '';
+                var ctx = $('#numberCanvas')[0].getContext('2d');
+                var canvasData = ctx.getImageData(0, 0, dimension, dimension);
+
+                for (var y = 0; y < dimension; y++) {
+                    for (var x = 0; x < dimension; x++) {
+                        var index = (x + y * dimension) * 4;
+                        var r = canvasData.data[index];
+                        var g = canvasData.data[index + 1];
+                        var b = canvasData.data[index + 2];
+                        console.info('(' + x + ',' + y + ') ==> ' + r + '.' + g + '.' + b);
+                        result += (r == 255) ? '0' : '1';
+                    }
+                    //result+='\n';
+                }
+                ctx.clearRect(0, 0, dimension, dimension);
+
+                var num = $('#variable').val();
+                var rest = 9-num;
+                var val="1";
+                for(var i=0; i<rest;i++){
+                    val="0"+val;
+                }
+                for(var i=0; i<num;i++){
+                    val=val+"0";
+                }
+
+                $('#featureValue').val($('#featureValue').val() + '\n' + val + ';' + result);
+            });
+
+            $('#btnClean').on('click', function (event) {
+                var ctx = $('#numberCanvas')[0].getContext('2d');
+                ctx.clearRect(0, 0, dimension, dimension);
+            });
+
+            $('#numberCanvas').on('mousemove', function (e) {
+                if (e.which == 1) {
+                    x = e.clientX - Math.ceil($('#numberCanvas').offset().left);
+                    y = e.clientY - Math.ceil($('#numberCanvas').offset().top);
+                    var ctx = $('#numberCanvas')[0].getContext('2d');
+                    ctx.lineJoin = "round";
+                    var canvasData = ctx.getImageData(0, 0, dimension, dimension);
+                    var index = (x + y * dimension) * 4;
+                    var r = 255;
+                    var g = 0;
+                    var b = 0;
+                    var a = 255;
+                    canvasData.data[index] = r;
+                    canvasData.data[index + 1] = g;
+                    canvasData.data[index + 2] = b;
+                    canvasData.data[index + 3] = a;
+                    ctx.putImageData(canvasData, 0, 0);
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+<table>
+    <tr>
+        <td><input id="variable" type="text">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <canvas id="numberCanvas" width="8" height="8" style="border:1px solid #c3c3c3;"></canvas>
+        </td>
+
+    </tr>
+    <tr>
+        <td><input id="btnNext" type="button" value="Next">
+            <input id="btnClean" type="button" value="Clean"></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <textarea readonly style="height: 519px;width: 700px;white-space: pre-wrap;" id="featureValue"
+                      rows="4"></textarea>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
